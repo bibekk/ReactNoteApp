@@ -7,14 +7,15 @@ class App extends React.Component{
         super(props);
         this.state = {
             notes : []
-
         }
       
         this.removeNote =this.removeNote.bind(this);
         this.newNote = this.newNote.bind(this);
+        this.cancelEdit =this.cancelEdit.bind(this);
+        this.editNote= this.editNote.bind(this);
         this.updateNote = this.updateNote.bind(this);
         this.restoreNote = this.restoreNote.bind(this);
-        this.deletePremanently = this.deletePremanently.bind(this);
+        this.deletePermanently = this.deletePermanently.bind(this);
     }
     
     //better to use this function than declaring the state in constructor
@@ -64,6 +65,12 @@ class App extends React.Component{
         console.log(newNote);
     }
     
+    cancelEdit(id){
+        var statecopy = Object.assign({},this.state);
+        statecopy.notes[id].editmode = false;
+        this.setState(statecopy);
+    }
+    
     removeNote(id){
         //cloning the state and updating it
         var statecopy = Object.assign({},this.state);
@@ -71,11 +78,18 @@ class App extends React.Component{
         this.setState(statecopy);
        }
     
+    editNote(i){
+        var arr = this.state;
+        arr.notes[i].editmode = true;
+        this.setState(arr);
+    }
+    
     updateNote(id,title,body){
-        var statecopy = Object.assign({},this.state);
-        statecopy.notes[id].title = title;
-        statecopy.notes[id].body = body;
-        this.setState(statecopy);
+        var arr = this.state;
+        arr.notes[id].title = title;
+        arr.notes[id].body = body;
+        arr.notes[id].editmode =false;
+        this.setState(arr);
     }
     
     restoreNote(id){
@@ -85,7 +99,7 @@ class App extends React.Component{
         this.setState(statecopy);
     }
     
-    deletePremanently(id){
+    deletePermanently(id){
         //removing permanently by splicing
         var arr = this.state;
         arr.notes.splice(id,1);
@@ -94,15 +108,15 @@ class App extends React.Component{
     
     
     render(){
-    
-        return(
-            <div className="panel"><div className="dashboard"><Dashboard restoreNoteCallBack={this.restoreNote}  notes={this.state.notes} deletePermCallBack={this.deletePremanently} /></div>    
+  
+        return( 
+            <div className="panel"><div className="dashboard"><Dashboard restoreNoteCallBack={this.restoreNote}  notes={this.state.notes} deletePermCallBack={this.deletePermanently} /></div>    
             
             <div className='notePanel'>
                 <button onClick={this.newNote} className="btn btn-primary addNote"><span className="glyphicon glyphicon-plus"></span></button>
                      {
-                        this.state.notes.map(function(item,i){
-                          return item.active?<Note editmode={item.editmode} title = {item.title} body={item.body} key={i} id={i} updateNoteCallBack={this.updateNote}  deleteNoteCallBack={()=> this.removeNote(i)} />:null;
+                        this.state.notes.map(function(item,i){ 
+                          return item.active?<Note editmode={item.editmode} title = {item.title} body={item.body} key={i} id={i} cancelEditNoteHandler={this.cancelEdit} editNoteHandler={this.editNote} updateNoteCallBack={this.updateNote}  deleteNoteCallBack={()=> this.removeNote(i)} />:null;
                         },this)
                     }
                 </div>

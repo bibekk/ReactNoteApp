@@ -5,61 +5,36 @@ class Note extends React.Component {
    constructor(props){
        super(props);
        
-       this.state = {
-           editmode: this.props.editmode,
-           title: this.props.title,
-           body : this.props.body,
-
-       }
-       
-       this.edit = this.edit.bind(this);
        this.cancelEdit = this.cancelEdit.bind(this);
        this.update = this.update.bind(this);
    }
-    
-    componentDidUpdate(){
-        //console.log(this);
-       // console.log(this.refs.commentTitle.value);
-    }
-    
        
     //handling the change in text value to update the state with new value
     handleTextChange(e){
         this.setState({ body :  e.target.value });
     }
     
-    //if edit button clicked edit state is set to true
-    edit(){
-      this.setState({ editmode: true});
-      }
     
     //canceling edit set editmode state to false
-    cancelEdit(){
-        this.setState({editmode: false});
+    cancelEdit(){ 
+        this.props.cancelEditNoteHandler(this.props.id);
     }
     
     //this sets editmode to false and updates the body with the latest state value
     update(){
-       this.setState({
-            editmode : false,
-            //getting the reference of the textarea name
-            title    : this.refs.commentTitle.value,
-            body     : this.refs.commentText.value
-        });
-        //Calling the parent function via prop
         this.props.updateNoteCallBack(this.props.id,this.refs.commentTitle.value, this.refs.commentText.value);
     }
       
     render() {
-       if(this.state.editmode){ 
+       if(this.props.editmode){ 
            return this.renderEdit()
        }
         
-       if(this.state.editmode === false) {
+       if(this.props.editmode === false) {
            return this.renderDefault();    
        }
        
-        if(this.state.active === false){
+        if(this.props.active === false){
             return null;
         }
     }
@@ -68,11 +43,11 @@ class Note extends React.Component {
     renderDefault(){
         return (
            <div className="note panel panel-primary bg-success">
-                <div className ="panel-heading">{this.state.title}</div>
+                <div className ="panel-heading">{this.props.title}</div>
                 <div className="panel-body">
-                    <div className ="commentText">{this.state.body}</div>
+                    <div className ="commentText">{this.props.body}</div>
                     <br/>
-                    <button type="button" className="btn btn-primary" onClick={this.edit}><span className ="glyphicon glyphicon-pencil"></span></button> 
+                    <button type="button" className="btn btn-primary" onClick={() =>this.props.editNoteHandler(this.props.id)}><span className ="glyphicon glyphicon-pencil"></span></button> 
                     &nbsp;
                    {/*use arrow function to pass values to method */}
                     <button type="button" className="btn btn-danger" onClick={this.props.deleteNoteCallBack}><span className ="glyphicon glyphicon-trash"></span></button> 
@@ -85,9 +60,9 @@ class Note extends React.Component {
     renderEdit(){
         return (
            <div className="note panel panel-primary bg-success">
-                <div className ="panel-heading"><input autoFocus ref="commentTitle" type="text" defaultValue={this.state.title}/></div>
+                <div className ="panel-heading"><input autoFocus ref="commentTitle" type="text" defaultValue={this.props.title}/></div>
                 <div className="panel-body">
-                    <textarea ref ="commentText" defaultValue={this.state.body}></textarea>
+                    <textarea ref ="commentText" defaultValue={this.props.body}></textarea>
                     <br/>
                     <button type="button" className="btn btn-warning" onClick={this.cancelEdit}><span className = "glyphicon glyphicon-remove">Cancel</span></button>       
                     &nbsp;
